@@ -1,9 +1,41 @@
 .container {
-  height: calc(100vh - 6.75rem);
+  width: 100vw;
+
+  button {
+    color: var(--highlight);
+    font-size: 1.125rem;
+
+    margin-top: 4rem;
+    background: none;
+    border: 0;
+
+    transition: filter 0.2s;
+
+    &:hover {
+      filter: brightness(0.8);
+    }
+  }
 }
 .content {
-  max-width: 1120px;
-  height: 6.75rem;
+  max-width: 700px;
   margin: 0 auto;
-  padding: 0 2rem;
+}
+
+.info {
+    display: flex;
+    flex-direction: row;
+    color: var(--info);
+
+    margin-top: 1.56rem;
+    margin-bottom: 3.25rem;
+
+      svg {
+        color: var(--heading);
+        margin-right: 0.5rem;
+      }
+
+
+    div + div {
+      margin-left: 2rem;
+    }
 }
