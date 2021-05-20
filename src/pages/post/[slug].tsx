@@ -1,5 +1,5 @@
 import { GetStaticPaths, GetStaticProps } from 'next';
-import { FiCalendar, FiUser } from 'react-icons/fi';
+import { FiCalendar, FiUser, FiWatch } from 'react-icons/fi';
 import Head from 'next/head';
 
 import { format } from 'date-fns';
@@ -7,6 +7,7 @@ import ptBR from 'date-fns/locale/pt-BR';
 
 import Prismic from '@prismicio/client';
 import { RichText } from 'prismic-dom';
+import { useRouter } from 'next/router';
 import { getPrismicClient } from '../../services/prismic';
 
 import commonStyles from '../../styles/common.module.scss';
@@ -27,6 +28,7 @@ interface Post {
       }[];
     }[];
   };
+  totalwords: string;
 }
 
 interface PostProps {
@@ -34,11 +36,18 @@ interface PostProps {
 }
 
 export default function Post({ post }: PostProps) {
-  const text = post.data.content.map(content => {
-    return RichText.asText(content.body);
+  const router = useRouter();
+
+  const textBody = post.data.content.map(content => {
+    return RichText.asText(content.body).split('').length;
   });
 
-  console.log(text);
+  const reducer = (acumulator, currentValue) => acumulator + currentValue;
+  const totalWords = Math.ceil(textBody.reduce(reducer) / 200);
+
+  if (router.isFallback) {
+    return <div>Carregando...</div>;
+  }
   return (
     <>
       <Head>
@@ -54,8 +63,8 @@ export default function Post({ post }: PostProps) {
           <div className={styles.post}>
             <strong>{post.data.title}</strong>
             <div className={commonStyles.info}>
-              <FiCalendar />
               <div>
+                <FiCalendar />
                 <time>
                   {format(
                     new Date(post.first_publication_date),
@@ -69,6 +78,10 @@ export default function Post({ post }: PostProps) {
               <div>
                 <FiUser />
                 <span>{post.data.author}</span>
+              </div>
+              <div>
+                <FiWatch />
+                {totalWords} Min
               </div>
             </div>
 
@@ -96,9 +109,9 @@ export default function Post({ post }: PostProps) {
 export const getStaticPaths: GetStaticPaths = async () => {
   const prismic = getPrismicClient();
   const { results } = await prismic.query(
-    [Prismic.Predicates.at('document.type', 'post')],
+    [Prismic.Predicates.at('document.type', 'posts')],
     {
-      fetch: ['post.uid'],
+      fetch: ['posts.uid', 'posts.title'],
     }
   );
 
