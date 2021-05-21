@@ -21,21 +21,14 @@
   margin: 0 auto;
 }
 
-.info {
-    display: flex;
-    flex-direction: row;
-    color: var(--info);
-
-    margin-top: 1.56rem;
-    margin-bottom: 3.25rem;
-
-      svg {
-        color: var(--heading);
-        margin-right: 0.5rem;
-      }
-
-
-    div  {
-      margin-left: 2rem;
+.infoBlock {
+  color: var(--info);
+    svg {
+      color: var(--heading);
+      margin-right: 0.5rem;
     }
+    div  {
+      margin-right: 2rem;
+    }
+
 }

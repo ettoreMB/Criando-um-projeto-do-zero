@@ -31,7 +31,10 @@ interface HomeProps {
   postsPagination: PostPagination;
 }
 
-export default function Home({ postsPagination }: HomeProps): JSX.Element {
+export default function Home({
+  postsPagination,
+  preview,
+}: HomeProps): JSX.Element {
   const [posts, setPosts] = useState(postsPagination);
 
   const loadMorePosts = useCallback(async () => {
@@ -57,25 +60,26 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
                 <strong>{post.data.title}</strong>
                 <p>{post.data.subtitle}</p>
 
-                <div className={commonStyles.info}>
-                  <FiCalendar />
-                  <div>
-                    <time>
-                      {format(
-                        new Date(post.first_publication_date),
-                        'dd MMM yyyy',
-                        {
-                          locale: ptBR,
-                        }
-                      )}
-                    </time>
-                  </div>
-                  <div>
-                    <FiUser />
-                    <span>{post.data.author}</span>
+                <div className={commonStyles.infoBlock}>
+                  <div className={styles.info}>
+                    <FiCalendar />
+                    <div>
+                      <time>
+                        {format(
+                          new Date(post.first_publication_date),
+                          'dd MMM yyyy',
+                          {
+                            locale: ptBR,
+                          }
+                        )}
+                      </time>
+                    </div>
+                    <div>
+                      <FiUser />
+                      <span>{post.data.author}</span>
+                    </div>
                   </div>
                 </div>
-
               </a>
             </Link>
           ))}
@@ -88,24 +92,36 @@ export default function Home({ postsPagination }: HomeProps): JSX.Element {
               Carregar mais posts
             </button>
           )}
+          {preview && (
+            <aside>
+              <Link href="/api/exit-preview">
+                <a>Sair do modo Preview</a>
+              </Link>
+            </aside>
+          )}
         </div>
       </main>
     </>
   );
 }
 
-export const getStaticProps: GetStaticProps = async () => {
+export const getStaticProps: GetStaticProps = async ({
+  preview = false,
+  previewData = {},
+}) => {
   const prismic = getPrismicClient();
   const postsResponse = await prismic.query(
     [Prismic.predicates.at('document.type', 'posts')],
     {
       pageSize: 1,
+      ref: previewData?.ref ?? null,
     }
   );
 
   return {
     props: {
       postsPagination: postsResponse,
+      preview,
     },
   };
 };
